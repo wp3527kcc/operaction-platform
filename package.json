@@ -1,0 +1,36 @@
+{
+  "name": "tc-operation-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ant-design/cssinjs": "^1.23.0",
+    "@ant-design/icons": "^6.0.0",
+    "@ant-design/nextjs-registry": "^1.0.2",
+    "@volcengine/tos-sdk": "^2.7.4",
+    "ahooks": "^3.9.0",
+    "antd": "^5.26.4",
+    "dayjs": "^1.11.13",
+    "mysql2": "^3.14.1",
+    "nacos": "^2.6.0",
+    "next": "15.3.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tc-health-check-node": "^1.0.9"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20.19.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
