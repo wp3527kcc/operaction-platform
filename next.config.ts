@@ -1,13 +1,10 @@
 import type { NextConfig } from "next";
 import { getNacosConfig } from "./nacos.conf.mjs"
-import healthCheck from 'tc-health-check-node';
 import { PHASE_PRODUCTION_SERVER } from 'next/constants'
 
 const nextConfig: NextConfig = async (phase: string, { defaultConfig }: { defaultConfig: NextConfig }) => {
   let nacosConfig = null
   if (phase === PHASE_PRODUCTION_SERVER) {
-    // 健康检查
-    healthCheck.start()
     nacosConfig = await getNacosConfig()
   }
   if (nacosConfig) {

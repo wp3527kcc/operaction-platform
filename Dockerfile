@@ -18,7 +18,6 @@ RUN pnpm -v
 COPY . .
 
 # 编译、清理devDependencies类型依赖，并上传静态文件
-RUN pnpm install tc-health-check-node --registry=https://nexus.tucdev.com/repository/tc-npm-group/
 RUN pnpm install
 # 运行构建命令
 RUN pnpm run build

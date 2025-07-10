@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { CloudUploadOutlined, HomeOutlined } from "@ant-design/icons";
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from "next/navigation";
 import type { MenuProps } from "antd";
 import { Layout, Menu, theme } from "antd";
 
@@ -26,14 +26,14 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-
   getItem("首页", "/", <HomeOutlined />),
   getItem("资源上传", "/upload", <CloudUploadOutlined />),
 ];
 
 const BasicLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const router = useRouter()
+  const router = useRouter();
+  const pathname = usePathname();
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -48,7 +48,7 @@ const BasicLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
-          defaultSelectedKeys={["/"]}
+          selectedKeys={[pathname]}
           onClick={(e) => {
             router.push(e.key);
           }}
