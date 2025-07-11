@@ -17,6 +17,7 @@
     "ahooks": "^3.9.0",
     "antd": "^5.26.4",
     "dayjs": "^1.11.13",
+    "mime-types": "^3.0.1",
     "mysql2": "^3.14.1",
     "nacos": "^2.6.0",
     "next": "15.3.5",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^20.19.4",
     "@types/react": "^19",
     "@types/react-dom": "^19",

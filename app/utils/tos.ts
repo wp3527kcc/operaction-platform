@@ -3,7 +3,7 @@
 import { TosClient, TosClientError, TosServerError } from '@volcengine/tos-sdk'
 const accessKeyId = process.env.TOS_ACCESS_KEY_ID || ""
 const accessKeySecret = process.env.TOS_ACCESS_KEY_SECRET || ''
-const bucketName = 'tc-prod-fe-staticfile';
+const bucketName = process.env.BUCKET_NAME || '' // 填写 Bucket 名称。以 operation-resource 为例，则 "Provide your bucket name" 填写为 operation-resource。;
 const region = process.env.TOS_REGION || '' // 填写 Bucket 所在地域。以华北2（北京)为例，则 "Provide your region" 填写为 cn-beijing。
 const endpoint = process.env.TOS_ENDPOINT || '' // 填写域名地址
 
@@ -32,7 +32,6 @@ function handleError(error: unknown) {
 
 export async function getFile(key: string) {
     try {
-        console.log('file key', key)
         const {
             data: { content },
         } = await client.getObjectV2({

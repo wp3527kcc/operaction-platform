@@ -46,7 +46,7 @@ const App: React.FC<{
   };
   function refreshList() {
     setRefreshLoading(true);
-    fetch("/api/upload")
+    fetch("/api/upload", { method: "POST" })
       .then((res) => res.json())
       .then((value) => setList(value))
       .finally(() => {
@@ -64,7 +64,7 @@ const App: React.FC<{
     });
     setUploading(true);
     fetch("/api/upload", {
-      method: "POST",
+      method: "PUT",
       body: formData,
     })
       .then((res) => res.json())
@@ -107,7 +107,13 @@ const App: React.FC<{
             <List.Item.Meta
               title={
                 <>
-                  <Paragraph copyable={{ text: item.fileurl }}>
+                  <Paragraph
+                    copyable={{
+                      text: item.fileurl.includes("https://")
+                        ? item.fileurl
+                        : location.origin + item.fileurl,
+                    }}
+                  >
                     {item.filepath}
                     <Tooltip title="点击预览">
                       <Button

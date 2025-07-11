@@ -1,11 +1,29 @@
-import { uploadFileReq, getUploadList } from '@/app/services/upload';
+import { uploadFileReq, getUploadList, getFileByKey } from '@/app/services/upload';
+import mime from 'mime-types';
 
-export const GET = async () => {
+export const GET = async (request: Request) => {
+    const url = new URL(request.url);
+    const key = url.searchParams.get('key');
+    if (!key) {
+        return Response.json({ message: 'Key is required' }, { status: 400 });
+    }
+    const ext = key.split('.').pop() || '';
+    const mimeType = mime.lookup(ext)
+    console.log(mimeType)
+    const fileContent = await getFileByKey(key);
+    return new Response(fileContent, {
+        headers: {
+            "Content-Type": mimeType + '; charset=utf-8',
+        }
+    })
+}
+
+export const POST = async () => {
     const fileList = await getUploadList();
     return Response.json(fileList)
 }
 
-export const POST = async (request: Request) => {
+export const PUT = async (request: Request) => {
     const promises = []
     const formData = await request.formData();
     const files = formData.getAll('files');
