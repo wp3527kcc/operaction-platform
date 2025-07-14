@@ -18,3 +18,13 @@ export async function uploadFileReq(file: File) {
 export async function getFileByKey(key: string) {
     return getFile(key)
 }
+
+export async function deleteFileByKey(key: string) {
+    try {
+        await pool.query('DELETE FROM upload_history WHERE id = ?', [key]);
+        return true;
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        return false;
+    }
+}

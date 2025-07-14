@@ -31,6 +31,7 @@ function handleError(error: unknown) {
 }
 
 export async function getFile(key: string) {
+    console.time('getFile ' + key)
     try {
         const {
             data: { content },
@@ -44,6 +45,7 @@ export async function getFile(key: string) {
         for await (const chunk of content) {
             allContent = Buffer.concat([allContent, Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)]);
         }
+        console.timeEnd('getFile ' + key)
         return allContent
     } catch {
         return '404 not found ' + `<h2>${key}</h2>`

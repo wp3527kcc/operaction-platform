@@ -1,4 +1,4 @@
-import { uploadFileReq, getUploadList, getFileByKey } from '@/app/services/upload';
+import { uploadFileReq, getUploadList, getFileByKey, deleteFileByKey } from '@/app/services/upload';
 import mime from 'mime-types';
 
 export const GET = async (request: Request) => {
@@ -38,4 +38,14 @@ export const PUT = async (request: Request) => {
     await Promise.allSettled(promises)
 
     return Response.json({ message: 'Files uploaded successfully' });
+}
+
+export const DELETE = async (request: Request) => {
+    const url = new URL(request.url);
+    const key = url.searchParams.get('key');
+    if (!key) {
+        return Response.json({ message: 'Key is required' }, { status: 400 });
+    }
+    await deleteFileByKey(key)
+    return Response.json({ message: `File with key ${key} deleted successfully`, rows: await getUploadList() });
 }

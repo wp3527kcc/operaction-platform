@@ -1,8 +1,16 @@
 "use client";
 import React from "react";
-import { Button, Upload, message, List, Typography, Tooltip } from "antd";
+import {
+  Button,
+  Upload,
+  message,
+  List,
+  Typography,
+  Tooltip,
+  Space,
+} from "antd";
+import { FolderViewOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile, GetProp } from "antd";
-import { FolderViewOutlined } from "@ant-design/icons";
 
 const { Paragraph } = Typography;
 
@@ -114,16 +122,31 @@ const App: React.FC<{
                         : location.origin + item.fileurl,
                     }}
                   >
-                    {item.filepath}
-                    <Tooltip title="点击预览">
-                      <Button
-                        icon={<FolderViewOutlined />}
-                        shape="circle"
+                    <Space>
+                      {item.filepath}
+                      <Tooltip title="点击预览">
+                        <FolderViewOutlined
+                          onClick={() => {
+                            window.open(item.fileurl, "_blank");
+                          }}
+                        />
+                      </Tooltip>
+                      <DeleteOutlined
                         onClick={() => {
-                          window.open(item.fileurl, "_blank");
+                          fetch(`/api/upload?key=${item.id}`, {
+                            method: "DELETE",
+                          })
+                            .then((res) => res.json())
+                            .then((result) => {
+                              messageApi.success("删除成功");
+                              setList(result.rows);
+                            })
+                            .catch(() => {
+                              messageApi.error("删除失败");
+                            });
                         }}
                       />
-                    </Tooltip>
+                    </Space>
                   </Paragraph>
                 </>
               }
