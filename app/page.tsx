@@ -1,9 +1,12 @@
 import React from "react";
+import { connection } from "next/server";
 import ExecutionLogs from "./components/ExecutionLogs";
 import { getExecutionLogs } from "./services/executionLogs";
 
 export default async function Home() {
   const [count, rows] = await getExecutionLogs();
+  await connection(); // 用于禁用缓存
+
   return (
     <div>
       <ExecutionLogs

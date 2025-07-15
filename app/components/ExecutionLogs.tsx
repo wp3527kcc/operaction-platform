@@ -32,6 +32,9 @@ const ModalColumns = [
     title: "帖子ID",
     dataIndex: "post_id",
     key: "post_id",
+    render: (post_id: string) => (
+      <a href={`https://tuchong.com/2501770/${post_id}`} target="_blank">{post_id}</a>
+    ),
   },
   {
     title: "标题",
