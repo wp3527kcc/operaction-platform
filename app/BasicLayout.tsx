@@ -26,7 +26,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem("首页", "/", <HomeOutlined />),
+  getItem("爬虫看板", "/", <HomeOutlined />),
   getItem("资源上传", "/upload", <CloudUploadOutlined />),
 ];
 
