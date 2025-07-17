@@ -117,9 +117,7 @@ const App: React.FC<{
                 <>
                   <Paragraph
                     copyable={{
-                      text: item.fileurl.includes("https://")
-                        ? item.fileurl
-                        : location.origin + item.fileurl,
+                      text: item.fileurl
                     }}
                   >
                     <Space>

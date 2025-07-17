@@ -52,13 +52,14 @@ const ExecutionLogs: React.FC<{
     output: string;
   }[];
   initCount: number;
-}> = ({ initList, initCount }) => {
+  initRedisCount: number
+}> = ({ initList, initCount, initRedisCount }) => {
   const [list, setList] = useState(initList);
   const [count, setCount] = useState(initCount);
   const [loading, setLoading] = useState(false);
   const [currentOutput, setCurrentOutput] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [redisCount, setRedisCount] = useState(0);
+  const [redisCount, setRedisCount] = useState(initRedisCount);
   useEffect(() => {
     getRedisCount().then(setRedisCount);
   }, []);
@@ -95,6 +96,7 @@ const ExecutionLogs: React.FC<{
             { dataIndex: "start_time", title: "Start Time" },
             { dataIndex: "end_time", title: "End Time" },
             { dataIndex: "effect_rows", title: "Effect Rows" },
+            { dataIndex: "userName", title: "userName" },
             {
               dataIndex: "output",
               title: "output",
