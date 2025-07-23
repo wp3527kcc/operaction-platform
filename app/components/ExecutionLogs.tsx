@@ -41,6 +41,11 @@ const ModalColumns = [
     dataIndex: "title",
     key: "title",
   },
+  {
+    title: "刷取阅读数",
+    dataIndex: "readCount",
+    key: "readCount",
+  },
 ];
 
 const ExecutionLogs: React.FC<{
@@ -50,6 +55,7 @@ const ExecutionLogs: React.FC<{
     end_time: string;
     id: number;
     output: string;
+    userName: string;
   }[];
   initCount: number;
   initRedisCount: number
@@ -79,8 +85,9 @@ const ExecutionLogs: React.FC<{
         <Table
           loading={loading}
           dataSource={list.map(
-            ({ effect_rows, start_time, end_time, id, output }) => ({
+            ({ effect_rows, start_time, end_time, id, output, userName }) => ({
               effect_rows,
+              userName,
               start_time: start_time
                 ? dayjs(start_time).format("YYYY-MM-DD HH:mm:ss")
                 : "-",
@@ -122,9 +129,10 @@ const ExecutionLogs: React.FC<{
           onChange={async ({ current }) => {
             try {
               setLoading(true);
-              const [count, rows] = await getExecutionLogs(current);
+              const [[count, rows], rdCou] = await Promise.all([getExecutionLogs(current), getRedisCount()]);
               // const result = await fetch("/api/executionLog?current=" + current);
               // const { count, rows } = await result.json();
+              setRedisCount(rdCou)
               setList(rows);
               setCount(count);
             } finally {

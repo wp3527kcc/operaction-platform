@@ -20,6 +20,7 @@ export default async function Home() {
             end_time: string;
             id: number;
             output: string;
+            userName: string;
           }[]
         }
       />
