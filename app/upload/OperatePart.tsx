@@ -21,7 +21,7 @@ const MAXCOUNT = 10;
 const MAXSIZE = 1024 * 1024 * 500; // 500MB
 
 // 新增分片上传相关常量
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const CHUNK_SIZE = 1 * 1024 * 1024; // 5MB
 
 const App: React.FC<{
   initFileList: { id: number; fileurl: string; filepath: string }[];
