@@ -17,22 +17,6 @@ async function checkFileExists(hash: string) {
     return result as { fileurl: string; filepath: string } | null;
 }
 
-// export const GET = async (request: Request) => {
-//     const url = new URL(request.url);
-//     const key = url.searchParams.get('key');
-//     if (!key) {
-//         return Response.json({ message: 'Key is required' }, { status: 400 });
-//     }
-//     const ext = key.split('.').pop() || '';
-//     const mimeType = mime.lookup(ext);
-//     const fileContent = await getFileByKey(key);
-//     return new Response(fileContent, {
-//         headers: {
-//             'Content-Type': mimeType + '; charset=utf-8',
-//         },
-//     });
-// };
-
 // 获取上传列表
 export const POST = async () => {
     const fileList = await getUploadList();
@@ -82,7 +66,6 @@ export async function DELETE(request: Request) {
         key,
         uploadId,
         parts
-        // parts: parts.map((p: { partNumber: string; etag: string; }) => ({ PartNumber: p.partNumber, ETag: p.etag })),
     });
     // 记录数据库
     await pool.query('INSERT INTO upload_history (filepath, fileurl, create_by, filehash) VALUES (?, ?, ?, ?)', [key, `${process.env.CDNBASEURL}${key}`, 'admin', fileHash]);
