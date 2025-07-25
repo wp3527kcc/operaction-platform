@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import SparkMD5 from "spark-md5";
 import {
   Button,
   Upload,
@@ -11,12 +12,16 @@ import {
 } from "antd";
 import { FolderViewOutlined, DeleteOutlined } from "@ant-design/icons";
 import type { UploadProps, UploadFile, GetProp } from "antd";
+import { initUpload } from "../utils/clientTOS";
 
 const { Paragraph } = Typography;
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 const MAXCOUNT = 10;
 const MAXSIZE = 1024 * 1024 * 500; // 500MB
+
+// 新增分片上传相关常量
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 const App: React.FC<{
   initFileList: { id: number; fileurl: string; filepath: string }[];
@@ -61,33 +66,104 @@ const App: React.FC<{
         setRefreshLoading(false);
       });
   }
-  const handleUpload = () => {
-    const formData = new FormData();
-    fileList.forEach((file) => {
-      formData.append(
-        "files",
-        new Blob([file as FileType], { type: file.type }),
-        encodeURIComponent(file.name)
-      );
-    });
+  const handleChunkUpload = async () => {
+    if (fileList.length === 0) return;
     setUploading(true);
-    fetch("/api/upload", {
-      method: "PUT",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then(() => {
-        setFileList([]);
-        refreshList();
-        message.success("upload successfully.");
-      })
-      .catch(() => {
-        message.error("upload failed.");
-      })
-      .finally(() => {
-        setUploading(false);
-      });
+    try {
+      for (const file of fileList) {
+        const rawFile = file as FileType;
+        // 1. 计算文件 hash
+        const hash = await calculateFileHash(rawFile);
+        const chunkCount = Math.ceil(rawFile.size / CHUNK_SIZE);
+        const {
+          uploadId,
+          key,
+          exists,
+          message: msg,
+        } = await initUpload(rawFile, hash);
+        if (exists) {
+          messageApi.success(msg);
+          return;
+        }
+        const promises = [];
+        // 2. 分片上传
+        for (let i = 0; i < chunkCount; i++) {
+          const partNumber = i + 1; // partNumber 从 1 开始
+          const start = i * CHUNK_SIZE;
+          const end = Math.min(rawFile.size, start + CHUNK_SIZE);
+          const chunk = rawFile.slice(start, end);
+          const formData = new FormData();
+          formData.append(
+            "file",
+            new Blob([chunk as FileType], { type: rawFile.type })
+          );
+          formData.append("UploadId", uploadId);
+          formData.append("partNumber", partNumber + "");
+          formData.append("objectName", key);
+          promises.push(
+            new Promise((resolve, reject) => {
+              fetch("/api/uploadFile", {
+                method: "PUT",
+                body: formData,
+              })
+                .then((res) => res.json())
+                .then((data) => {
+                  resolve({
+                    eTag: data.data.ETag,
+                    partNumber,
+                  });
+                })
+                .catch(reject);
+            })
+          );
+        }
+        // 3. 通知后端合并分片
+        const result = await fetch("/api/uploadFile", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uploadId,
+            hash,
+            key: key,
+            parts: await Promise.all(promises),
+          }),
+        });
+        messageApi.success((await result.json()).message);
+      }
+      setFileList([]);
+      refreshList();
+    } catch {
+      messageApi.error("upload failed.");
+    } finally {
+      setUploading(false);
+    }
   };
+
+  // 计算文件 hash
+  async function calculateFileHash(file: FileType): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const chunkCount = Math.ceil(file.size / CHUNK_SIZE);
+      let currentChunk = 0;
+      const spark = new SparkMD5.ArrayBuffer();
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        spark.append(e.target?.result as ArrayBuffer);
+        currentChunk++;
+        if (currentChunk < chunkCount) {
+          loadNext();
+        } else {
+          resolve(spark.end());
+        }
+      };
+      fileReader.onerror = () => reject("文件读取失败");
+      function loadNext() {
+        const start = currentChunk * CHUNK_SIZE;
+        const end = Math.min(file.size, start + CHUNK_SIZE);
+        fileReader.readAsArrayBuffer(file.slice(start, end));
+      }
+      loadNext();
+    });
+  }
   return (
     <>
       {contextHolder}
@@ -98,7 +174,7 @@ const App: React.FC<{
       </div>
       <Button
         type="primary"
-        onClick={handleUpload}
+        onClick={handleChunkUpload}
         disabled={fileList.length === 0}
         loading={uploading}
         style={{ marginTop: 16 }}
@@ -117,7 +193,7 @@ const App: React.FC<{
                 <>
                   <Paragraph
                     copyable={{
-                      text: item.fileurl
+                      text: item.fileurl,
                     }}
                   >
                     <Space>
